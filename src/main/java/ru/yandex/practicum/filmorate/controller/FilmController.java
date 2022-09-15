@@ -15,7 +15,10 @@ import java.util.*;
 @RequestMapping("/films")
 public class FilmController {
     private final Map<Integer, Film> films = new HashMap<>();
-
+    private int idCount=0;
+    private int makeNewId(){
+        return ++idCount;
+    }
     @GetMapping
     public Collection<Film> findAll() {
         log.debug("Текущее количество фильмов: {}", films.size());
@@ -23,32 +26,26 @@ public class FilmController {
     }
 
     @PostMapping
-    public Film create(@Valid @RequestBody Film film) {
+    public Film create(@Valid @RequestBody Film film) throws ValidationException {
         if(film.getDescription().length()>200 || film.getDuration()<0 ||
                 film.getReleaseDate().isBefore(LocalDate.of(1895,10,28))) {
             throw new ValidationException("Фильм не соответсвует критериям.");
         }
 
         if(film.getId()==null){
-            film.setId(1);
+            film.setId(makeNewId());
         }
         films.put(film.getId(), film);
         return film;
     }
 
     @PutMapping
-    public Film put(@Valid @RequestBody Film film){
+    public Film put(@Valid @RequestBody Film film) throws ValidationException {
         if(film.getDescription().length()>200 || film.getDuration()<0||
                 film.getReleaseDate().isBefore(LocalDate.of(1895,10,28))) {
             throw new ValidationException("Фильм не соответсвует критериям.");
         }
-        boolean flag=false;
-        for(Film film1 : films.values()){
-            if(film1.getId()==film.getId()){
-                flag=true;
-            }
-        }
-        if(flag){
+        if(films.containsKey(film.getId())){
             films.put(film.getId(), film);
         } else {
             throw new ValidationException("Пользователь не соответсвует критериям.");
