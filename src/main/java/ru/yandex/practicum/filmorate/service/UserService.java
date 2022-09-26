@@ -26,8 +26,8 @@ public class UserService  implements UserStorage {
 
     public User addFriend(Integer id, Integer friendId)  {
 
-        User userMain=inMemoryUserStorage.usersContainUser(id);
-        User userFriend=inMemoryUserStorage.usersContainUser(friendId);
+        User userMain=inMemoryUserStorage.getUser(id);
+        User userFriend=inMemoryUserStorage.getUser(friendId);
         if(userMain.getFriendIds()==null){
             userMain.setFriendIds(new HashSet<>());
             userMain.getFriendIds().add(friendId);
@@ -44,32 +44,16 @@ public class UserService  implements UserStorage {
         return userMain;
     }
 
-    public Collection<User> findAll(Integer id) {
-        User userMain=inMemoryUserStorage.usersContainUser(id);
+    public Collection<User> getUserFriendsById(Integer id) {
+        User userMain=inMemoryUserStorage.getUser(id);
         if(userMain.getFriendIds()==null){
             userMain.setFriendIds(new HashSet<>());
         }
-        Set<Integer> list=userMain.getFriendIds();
-        return inMemoryUserStorage.findAll().stream().filter(p-> list.contains(p.getId())).collect(Collectors.toList());
+        return inMemoryUserStorage.getUserFriends(userMain);
     }
 
     public User delete(Integer id, Integer friendId) {
-        User userMain=inMemoryUserStorage.usersContainUser(id);
-        User userFriend=inMemoryUserStorage.usersContainUser(friendId);
-        if(userMain.getFriendIds()==null){
-            userMain.setFriendIds(new HashSet<>());
-            userMain.getFriendIds().remove(friendId);
-        } else{
-            userMain.getFriendIds().remove(friendId);
-        }
-        if(userFriend.getFriendIds()==null){
-            userFriend.setFriendIds(new HashSet<>());
-            userFriend.getFriendIds().remove(id);
-        } else{
-            userFriend.getFriendIds().remove(id);
-        }
-
-        return userMain;
+        return inMemoryUserStorage.removeFriend(id, friendId);
     }
 
     @Override

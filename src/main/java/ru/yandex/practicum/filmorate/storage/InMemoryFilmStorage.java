@@ -12,6 +12,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Component
 public class InMemoryFilmStorage implements FilmStorage{
@@ -69,11 +70,31 @@ public class InMemoryFilmStorage implements FilmStorage{
         }
         return film;
     }
-    public Film filmsContainfilm(Integer id)  {
+    public Film getFilm(Integer id)  {
         if(films.containsKey(id)){
             return  films.get(id);
         } else{
             throw new ObjectNotFoundException("Пользователь не найден");
         }
+    }
+
+    public Collection<Film> getPopularFilmsByCount(Integer count) {
+        return films.values().stream().sorted((p0, p1) -> compare(p0, p1))
+                .limit(count)
+                .collect(Collectors.toList());
+    }
+
+    public Film removeFilmLikeByUser(User user, Film film) throws ValidationException {
+        if(user!=null && film!=null){
+            film.getUserId().remove(user.getId());
+        } else {
+            throw new ValidationException("Пользователь не соответсвует критериям.");
+        }
+        return film;
+    }
+
+    private int compare(Film p0, Film p1) {
+        int result = p1.getUserId().size()- p0.getUserId().size(); //прямой порядок сортировки
+        return result;
     }
 }

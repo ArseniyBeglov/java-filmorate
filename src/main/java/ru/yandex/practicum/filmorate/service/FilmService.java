@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
@@ -16,6 +17,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 @Getter
 public class FilmService  {
     private final UserService userService;
@@ -29,39 +31,27 @@ public class FilmService  {
 
 
     public Film addLike(Integer id, Integer userId)  {
-        User user=userService.getInMemoryUserStorage().usersContainUser(userId);
-        Film film=inMemoryFilmStorage.filmsContainfilm(id);
+        User user=userService.getInMemoryUserStorage().getUser(userId);
+        Film film=inMemoryFilmStorage.getFilm(id);
         if(film.getUserId()==null){
             film.setUserId(new HashSet<>());
             film.getUserId().add(userId);
         } else{
             film.getUserId().add(userId);
         }
-        System.out.println("ggwp");
-        System.out.println(film);
         return film;
     }
 
     public Film delete(Integer id, Integer userId) throws ValidationException {
-        User user=userService.getInMemoryUserStorage().usersContainUser(userId);
-        Film film=inMemoryFilmStorage.filmsContainfilm(id);
-        if(user!=null && film!=null){
-            film.getUserId().remove(userId);
-        } else {
-            throw new ValidationException("Пользователь не соответсвует критериям.");
-        }
-        return film;
+        User user=userService.getInMemoryUserStorage().getUser(userId);
+        Film film=inMemoryFilmStorage.getFilm(id);
+        return inMemoryFilmStorage.removeFilmLikeByUser(user,film);
     }
 
 
-    public Collection<Film> findAll(Integer count) {
-        return inMemoryFilmStorage.findAll().stream().sorted((p0, p1) -> compare(p0, p1))
-                .limit(count)
-                .collect(Collectors.toList());
+    public Collection<Film> getPopularFilms(Integer count) {
+        return inMemoryFilmStorage.getPopularFilmsByCount(count);
     }
 
-    private int compare(Film p0, Film p1) {
-        int result = p1.getUserId().size()- p0.getUserId().size(); //прямой порядок сортировки
-        return result;
-    }
+
 }

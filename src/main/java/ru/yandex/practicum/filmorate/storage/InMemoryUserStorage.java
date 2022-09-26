@@ -11,7 +11,9 @@ import ru.yandex.practicum.filmorate.model.User;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Component
 public class InMemoryUserStorage implements UserStorage{
@@ -63,11 +65,34 @@ public class InMemoryUserStorage implements UserStorage{
         return user;
     }
 
-    public User usersContainUser(Integer id)  {
+    public User getUser(Integer id)  {
         if(users.containsKey(id)){
             return  users.get(id);
         } else{
             throw new ObjectNotFoundException("Пользователь не найден");
         }
+    }
+
+    public Collection<User> getUserFriends(User user){
+        return users.values().stream().filter(p-> user.getFriendIds().contains(p.getId())).collect(Collectors.toList());
+    }
+
+    public User removeFriend(Integer id, Integer friendId)  {
+        User userMain=getUser(id);
+        User userFriend=getUser(friendId);
+        if(userMain.getFriendIds()==null){
+            userMain.setFriendIds(new HashSet<>());
+            userMain.getFriendIds().remove(friendId);
+        } else{
+            userMain.getFriendIds().remove(friendId);
+        }
+        if(userFriend.getFriendIds()==null){
+            userFriend.setFriendIds(new HashSet<>());
+            userFriend.getFriendIds().remove(id);
+        } else{
+            userFriend.getFriendIds().remove(id);
+        }
+
+        return userMain;
     }
 }

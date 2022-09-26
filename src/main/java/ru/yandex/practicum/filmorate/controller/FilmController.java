@@ -57,11 +57,11 @@ public class FilmController {
         if (count <= 0) {
             throw new ValidationException("count");
         }
-        return filmService.findAll(count);
+        return filmService.getPopularFilms(count);
     }
 
     @GetMapping("/{id}")
     public Film getFilmById(@PathVariable Integer id)  {
-        return filmService.getInMemoryFilmStorage().filmsContainfilm(id);
+        return filmService.getInMemoryFilmStorage().getFilm(id);
     }
 }

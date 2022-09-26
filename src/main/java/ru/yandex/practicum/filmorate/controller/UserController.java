@@ -56,17 +56,17 @@ public class UserController {
 
     @GetMapping("/{id}/friends")
     public Collection<User> allFriends(@PathVariable Integer id)  {
-        return userService.findAll(id);
+        return userService.getUserFriendsById(id);
     }
 
     @GetMapping("/{id}")
     public User getUserById(@PathVariable Integer id)  {
-        return userService.getInMemoryUserStorage().usersContainUser(id);
+        return userService.getInMemoryUserStorage().getUser(id);
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")
     public Collection<User> commonFriends(@PathVariable Integer id,@PathVariable Integer otherId) {
-        return userService.findAll(id).stream().filter(userService.findAll(otherId)::contains).
+        return userService.getUserFriendsById(id).stream().filter(userService.getUserFriendsById(otherId)::contains).
                 collect(Collectors.toList());
     }
 }
