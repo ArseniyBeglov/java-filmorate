@@ -8,6 +8,7 @@ import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.Objects;
 import java.time.Duration;
+import java.util.Set;
 
 
 @Data
@@ -18,4 +19,5 @@ public class Film {
     private String description;
     private LocalDate releaseDate;
     private int duration;
+    private Set<Integer> userId;
 }
