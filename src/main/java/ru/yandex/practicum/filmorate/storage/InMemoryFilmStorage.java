@@ -7,11 +7,9 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 
 
+import java.time.Instant;
 import java.time.LocalDate;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
@@ -30,15 +28,15 @@ public class InMemoryFilmStorage implements FilmStorage{
     @Override
     public Film create(Film film) throws ValidationException {
         if(film.getDescription().length()>200 || film.getDuration()<0 ||
-                film.getReleaseDate().isBefore(LocalDate.of(1895,10,28))) {
+                film.getReleaseDate().before(Date.from(Instant.parse("1895,10,28")))) {
             throw new ValidationException("Фильм не соответсвует критериям.");
         }
         if(film.getId()==null){
             film.setId(makeNewId());
         }
-        if(film.getUserId()==null){
-            film.setUserId(new HashSet<>());
-        }
+//        if(film.getUserId()==null){
+//            film.setUserId(new HashSet<>());
+//        }
         films.put(film.getId(), film);
         return film;
     }
@@ -46,14 +44,14 @@ public class InMemoryFilmStorage implements FilmStorage{
     @Override
     public Film put(Film film) throws ValidationException {
         if(film.getDescription().length()>200 || film.getDuration()<0||
-                film.getReleaseDate().isBefore(LocalDate.of(1895,10,28))) {
+                film.getReleaseDate().before(Date.from(Instant.parse("1895,10,28")))) {
             throw new ValidationException("Фильм не соответсвует критериям.");
         }
         if(films.containsKey(film.getId())){
-            if(film.getUserId()==null){
-                film.setUserId(films.get(film.getId()).getUserId());
-            }
-            film.setUserId(films.get(film.getId()).getUserId());
+//            if(film.getUserId()==null){
+//                film.setUserId(films.get(film.getId()).getUserId());
+//            }
+//            film.setUserId(films.get(film.getId()).getUserId());
             films.put(film.getId(), film);
         } else {
             throw new ObjectNotFoundException("Фильм не найден.");
@@ -86,7 +84,7 @@ public class InMemoryFilmStorage implements FilmStorage{
 
     public Film removeFilmLikeByUser(User user, Film film) throws ValidationException {
         if(user!=null && film!=null){
-            film.getUserId().remove(user.getId());
+            //film.getUserId().remove(user.getId());
         } else {
             throw new ValidationException("Пользователь не соответсвует критериям.");
         }
@@ -94,7 +92,7 @@ public class InMemoryFilmStorage implements FilmStorage{
     }
 
     private int compare(Film p0, Film p1) {
-        int result = p1.getUserId().size()- p0.getUserId().size(); //прямой порядок сортировки
-        return result;
+        //int result = p1.getUserId().size()- p0.getUserId().size(); //прямой порядок сортировки
+        return 0;
     }
 }

@@ -8,11 +8,9 @@ import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
 
+import java.time.Instant;
 import java.time.LocalDate;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
@@ -39,7 +37,7 @@ public class InMemoryUserStorage implements UserStorage{
 
     @Override
     public User create( User user) throws ValidationException {
-        if(user.getBirthday().isAfter(LocalDate.now())) {
+        if(user.getBirthday().after(Date.from(Instant.now()))) {
             throw new ValidationException("Пользователь не соответсвует критериям.");
         }
         if(user.getId()==null){
@@ -54,7 +52,7 @@ public class InMemoryUserStorage implements UserStorage{
 
     @Override
     public User put( User user) throws ValidationException {
-        if( user.getBirthday().isAfter(LocalDate.now())) {
+        if( user.getBirthday().after(Date.from(Instant.now()))) {
             throw new ValidationException("Пользователь не соответсвует критериям.");
         }
         if(users.containsKey(user.getId())){
@@ -74,24 +72,25 @@ public class InMemoryUserStorage implements UserStorage{
     }
 
     public Collection<User> getUserFriends(User user){
-        return users.values().stream().filter(p-> user.getFriendIds().contains(p.getId())).collect(Collectors.toList());
+        //return users.values().stream().filter(p-> user.getFriendIds().contains(p.getId())).collect(Collectors.toList());
+        return users.values().stream().collect(Collectors.toList());
     }
 
     public User removeFriend(Integer id, Integer friendId)  {
         User userMain=getUser(id);
         User userFriend=getUser(friendId);
-        if(userMain.getFriendIds()==null){
-            userMain.setFriendIds(new HashSet<>());
-            userMain.getFriendIds().remove(friendId);
-        } else{
-            userMain.getFriendIds().remove(friendId);
-        }
-        if(userFriend.getFriendIds()==null){
-            userFriend.setFriendIds(new HashSet<>());
-            userFriend.getFriendIds().remove(id);
-        } else{
-            userFriend.getFriendIds().remove(id);
-        }
+//        if(userMain.getFriendIds()==null){
+//            userMain.setFriendIds(new HashSet<>());
+//            userMain.getFriendIds().remove(friendId);
+//        } else{
+//            userMain.getFriendIds().remove(friendId);
+//        }
+//        if(userFriend.getFriendIds()==null){
+//            userFriend.setFriendIds(new HashSet<>());
+//            userFriend.getFriendIds().remove(id);
+//        } else{
+//            userFriend.getFriendIds().remove(id);
+//        }
 
         return userMain;
     }
