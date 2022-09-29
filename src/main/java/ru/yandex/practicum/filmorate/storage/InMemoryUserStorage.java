@@ -10,6 +10,7 @@ import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -37,7 +38,9 @@ public class InMemoryUserStorage implements UserStorage{
 
     @Override
     public User create( User user) throws ValidationException {
-        if(user.getBirthday().after(Date.from(Instant.now()))) {
+        if(user.getBirthday().toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate().isAfter(LocalDate.now())) {
             throw new ValidationException("Пользователь не соответсвует критериям.");
         }
         if(user.getId()==null){
@@ -52,7 +55,9 @@ public class InMemoryUserStorage implements UserStorage{
 
     @Override
     public User put( User user) throws ValidationException {
-        if( user.getBirthday().after(Date.from(Instant.now()))) {
+        if( user.getBirthday().toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate().isAfter(LocalDate.now())) {
             throw new ValidationException("Пользователь не соответсвует критериям.");
         }
         if(users.containsKey(user.getId())){

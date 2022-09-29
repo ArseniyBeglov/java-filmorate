@@ -9,6 +9,7 @@ import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.User;
 
+import java.time.ZoneId;
 import java.util.Optional;
 @Component
 public class UserDaoImpl implements UserDao{

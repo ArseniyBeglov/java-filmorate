@@ -14,6 +14,7 @@ import ru.yandex.practicum.filmorate.storage.UserFriendDbStorage;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.Optional;
 
@@ -31,7 +32,8 @@ class FilmorateApplicationTests {
 
 		UserService userService= new UserService(new UserDbStorage(new JdbcTemplate()), new UserFriendDbStorage(new JdbcTemplate()));
 		Optional<User> userOptiona = Optional.ofNullable(userService.getUserDbStorage().create(new User(1,
-				"user@gmail.com", "gg", "serg", Date.from(Instant.parse("1999-12-22")))));
+				"user@gmail.com", "gg", "serg", Date.from(LocalDate.of(1999,12,30).
+				atStartOfDay(ZoneId.systemDefault()).toInstant()))));
 		Optional<User> userOptional = userService.getUserDbStorage().getUser(1);
 
 		assertThat(userOptional)
