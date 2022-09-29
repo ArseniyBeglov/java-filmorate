@@ -7,6 +7,7 @@ import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import ru.yandex.practicum.filmorate.dao.UserDaoImpl;
+import ru.yandex.practicum.filmorate.exception.ObjectNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
@@ -18,34 +19,44 @@ import java.util.Collection;
 import java.util.Optional;
 
 @Component("userDbStorage")
-public class UserDbStorage implements UserStorage{
+public class UserDbStorage implements UserStorage {
     private final Logger log = LoggerFactory.getLogger(UserDaoImpl.class);
     private final JdbcTemplate jdbcTemplate;
-    private int idCount=0;
-    private int makeNewId(){
+    private int idCount = 0;
+
+    private int makeNewId() {
         return ++idCount;
     }
+
     public UserDbStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
     @Override
     public User create(User user) throws ValidationException {
-        String sqlQuery = "insert into users(id, email, login,name,birthday) " +
-                "values (?, ?, ?,?,?)";
-        if(user.getBirthday().toInstant()
+        String sqlQuery = "insert into users( email, login,name,birthday) " +
+                "values ( ?, ?,?,?)";
+        if (user.getBirthday().toInstant()
                 .atZone(ZoneId.systemDefault())
                 .toLocalDate().isAfter(LocalDate.now())) {
             throw new ValidationException("Пользователь не соответсвует критериям.");
         }
-        if(user.getId()==null){
-            user.setId(makeNewId());
-        }
-        if(!StringUtils.hasText(user.getName())){
+        if (!StringUtils.hasText(user.getName())) {
             user.setName(user.getLogin());
         }
         jdbcTemplate.update(sqlQuery,
-                user.getId(),user.getEmail(),user.getLogin(),user.getName(),user.getBirthday());
+                user.getEmail(), user.getLogin(), user.getName(), user.getBirthday());
+        SqlRowSet userRows = jdbcTemplate.queryForRowSet("select * from users where login = ?", user.getLogin());
+
+        // обрабатываем результат выполнения запроса
+        if(userRows.next()) {
+            User user1= new User(
+                    userRows.getInt("id"),
+                    userRows.getString("email"),
+                    userRows.getString("login"),
+                    userRows.getString("name"),
+                    userRows.getDate("birthday"));
+            return user1;}
         return user;
     }
 
@@ -54,9 +65,11 @@ public class UserDbStorage implements UserStorage{
         String sqlQuery = "update users set " +
                 " email = ?, login = ?,name = ?,birthday=? " +
                 "where id = ?";
-
+        if(!getUser(user.getId()).isPresent()){
+            throw new ObjectNotFoundException("Пользователь не найден");
+        }
         jdbcTemplate.update(sqlQuery
-                ,user.getEmail()
+                , user.getEmail()
                 , user.getLogin()
                 , user.getName()
                 , user.getBirthday(),
@@ -73,7 +86,7 @@ public class UserDbStorage implements UserStorage{
     @Override
     public User delete(User user) throws ValidationException {
         String sqlQuery = "delete from users where id = ?";
-        jdbcTemplate.update(sqlQuery, user.getId()) ;
+        jdbcTemplate.update(sqlQuery, user.getId());
         return user;
     }
 
@@ -87,11 +100,11 @@ public class UserDbStorage implements UserStorage{
                 .build();
     }
 
-    public Optional<User> getUser(Integer id)  {
+    public Optional<User> getUser(Integer id) {
         SqlRowSet userRows = jdbcTemplate.queryForRowSet("select * from users where id = ?", id);
 
         // обрабатываем результат выполнения запроса
-        if(userRows.next()) {
+        if (userRows.next()) {
             User user = new User(
                     userRows.getInt("id"),
                     userRows.getString("email"),
@@ -104,7 +117,7 @@ public class UserDbStorage implements UserStorage{
             return Optional.of(user);
         } else {
             log.info("Пользователь с идентификатором {} не найден.", id);
-            return Optional.empty();
+            throw new ObjectNotFoundException("Пользователь не найден");
         }
     }
 }

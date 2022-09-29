@@ -27,7 +27,11 @@ public class UserService   {
     }
 
     public User addFriend(Integer id, Integer friendId) throws ValidationException {
-        return userFriendDbStorage.create(id,friendId);
+        if(userDbStorage.getUser(friendId).isPresent() && userDbStorage.getUser(friendId).isPresent() ){
+            return userFriendDbStorage.create(id,friendId);
+        } else {
+            throw new ValidationException("неверный запрос");
+        }
     }
 
     public Collection<User> getUserFriendsById(Integer id) {

@@ -43,10 +43,9 @@ public class FilmDbStorage implements FilmStorage{
 
     @Override
     public Film create(Film film) throws ValidationException {
-        String sqlQuery = "insert into films(id, name, description,release_date, duration, genre_id ) " +
-                "values (?, ?, ?,?,?,?)";
+        String sqlQuery = "insert into films( name, description,release_date, duration, genre_id ) " +
+                "values ( ?, ?,?,?,?)";
         jdbcTemplate.update(sqlQuery,
-                film.getId(),
                 film.getName(),
                 film.getDescription(),
                 film.getReleaseDate(),

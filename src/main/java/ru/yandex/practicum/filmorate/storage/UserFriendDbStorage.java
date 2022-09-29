@@ -40,7 +40,7 @@ public class UserFriendDbStorage {
 
     public Collection<User> getUserFriends(Integer id) {
         String sqlQuery = "select friend_id " +
-                "from user_friends where id = ?";
+                "from user_friends where user_id = ?";
         return jdbcTemplate.query(sqlQuery, this::mapRowToUser,id);
     }
     private User mapRowToUser(ResultSet resultSet, int rowNum) throws SQLException {
