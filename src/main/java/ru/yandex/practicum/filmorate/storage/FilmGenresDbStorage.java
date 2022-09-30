@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.storage;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.exception.ObjectNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genres;
@@ -54,17 +55,12 @@ public class FilmGenresDbStorage {
     }
 
     public Genres getGenre(Integer id)  {
-        SqlRowSet filmRows = jdbcTemplate.queryForRowSet("select * from genres where id = ?", id);
-
-        // обрабатываем результат выполнения запроса
-        if(filmRows.next()) {
-            Genres genres = new Genres(
-                    filmRows.getInt("id"),
-                    filmRows.getString("name "));
-            return genres;
-        } else {
-
-            return null;
+        Collection<Genres> genres = findAll();
+        if(genres.stream().filter(p->p.getId()==id).findFirst().isPresent()){
+            return genres.stream().filter(p->p.getId()==id).findFirst().get();
+        }else{
+            throw new ObjectNotFoundException("такого жанра нет");
         }
+
     }
 }

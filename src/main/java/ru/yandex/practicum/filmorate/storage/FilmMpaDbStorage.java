@@ -3,6 +3,8 @@ package ru.yandex.practicum.filmorate.storage;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.exception.ObjectNotFoundException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Genres;
 import ru.yandex.practicum.filmorate.model.MPA;
 
@@ -18,18 +20,16 @@ public class FilmMpaDbStorage {
     public FilmMpaDbStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
-    public Optional<MPA> getMpa(Integer id)  {
-        SqlRowSet filmRows = jdbcTemplate.queryForRowSet("select * from rating_mpa where id = ?", id);
+    public MPA getMpa(Integer id) {
 
-        // обрабатываем результат выполнения запроса
-        if(filmRows.next()) {
-            MPA mpa= new MPA(
-                    filmRows.getInt("id"),
-                    filmRows.getString("name "));
-            return Optional.of(mpa);
+        Collection<MPA> collection= findAll();
+        if(collection.stream().filter(mpa -> mpa.getId()==id).findFirst().isPresent()){
+            return collection.stream().filter(mpa -> mpa.getId()==id).findFirst().get();
         } else {
-            return Optional.empty();
+            throw new ObjectNotFoundException("такого mpa нет");
         }
+
+
     }
 
     public Collection<MPA> findAll() {

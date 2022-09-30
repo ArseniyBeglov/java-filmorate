@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.MPA;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
@@ -26,7 +27,7 @@ public class MPAController {
         return filmService.getFilmMpaDbStorage().findAll();
     }
     @GetMapping("/{id}")
-    public Optional<MPA> getGenresById(@PathVariable Integer id){
+    public MPA getGenresById(@PathVariable Integer id)  {
         return filmService.getFilmMpaDbStorage().getMpa(id);
     }
 }

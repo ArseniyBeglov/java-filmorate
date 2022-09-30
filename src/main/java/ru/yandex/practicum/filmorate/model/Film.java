@@ -23,6 +23,7 @@ public class Film {
     private String description;
     private Date releaseDate;
     private int duration;
+
     private int genreId;
 
 
