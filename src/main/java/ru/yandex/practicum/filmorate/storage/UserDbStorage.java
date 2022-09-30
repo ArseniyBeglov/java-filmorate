@@ -6,7 +6,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
-import ru.yandex.practicum.filmorate.dao.UserDaoImpl;
+
 import ru.yandex.practicum.filmorate.exception.ObjectNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
@@ -20,7 +20,7 @@ import java.util.Optional;
 
 @Component("userDbStorage")
 public class UserDbStorage implements UserStorage {
-    private final Logger log = LoggerFactory.getLogger(UserDaoImpl.class);
+    private final Logger log = LoggerFactory.getLogger(UserDbStorage.class);
     private final JdbcTemplate jdbcTemplate;
     private int idCount = 0;
 
@@ -36,9 +36,7 @@ public class UserDbStorage implements UserStorage {
     public User create(User user) throws ValidationException {
         String sqlQuery = "insert into users( email, login,name,birthday) " +
                 "values ( ?, ?,?,?)";
-        if (user.getBirthday().toInstant()
-                .atZone(ZoneId.systemDefault())
-                .toLocalDate().isAfter(LocalDate.now())) {
+        if (user.getBirthday().isAfter(LocalDate.now())) {
             throw new ValidationException("Пользователь не соответсвует критериям.");
         }
         if (!StringUtils.hasText(user.getName())) {
@@ -55,7 +53,7 @@ public class UserDbStorage implements UserStorage {
                     userRows.getString("email"),
                     userRows.getString("login"),
                     userRows.getString("name"),
-                    userRows.getDate("birthday"));
+                    userRows.getDate("birthday").toLocalDate());
             return user1;}
         return user;
     }
@@ -96,7 +94,7 @@ public class UserDbStorage implements UserStorage {
                 .email(resultSet.getString("email"))
                 .login(resultSet.getString("login"))
                 .name(resultSet.getString("name"))
-                .birthday(resultSet.getDate("birthday"))
+                .birthday(resultSet.getDate("birthday").toLocalDate())
                 .build();
     }
 
@@ -110,7 +108,7 @@ public class UserDbStorage implements UserStorage {
                     userRows.getString("email"),
                     userRows.getString("login"),
                     userRows.getString("name"),
-                    userRows.getDate("birthday"));
+                    userRows.getDate("birthday").toLocalDate());
 
             log.info("Найден пользователь: {} {}", user.getId(), user.getLogin());
 

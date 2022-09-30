@@ -24,10 +24,10 @@ public class User {
     @NotBlank
     private String login;
     private String name;
-    private Date birthday;
+    private LocalDate birthday;
 
 
-    public User(Integer id, String email, String login, String name, Date birthday) {
+    public User(Integer id, String email, String login, String name, LocalDate birthday) {
         this.id = id;
         this.email = email;
         this.login = login;

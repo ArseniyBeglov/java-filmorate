@@ -61,7 +61,7 @@ public class UserFriendDbStorage {
                     userRows.getString("email"),
                     userRows.getString("login"),
                     userRows.getString("name"),
-                    userRows.getDate("birthday"));
+                    userRows.getDate("birthday").toLocalDate());
             return user;
         }
         return null;

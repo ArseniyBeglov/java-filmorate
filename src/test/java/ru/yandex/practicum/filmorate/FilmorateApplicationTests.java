@@ -32,8 +32,7 @@ class FilmorateApplicationTests {
 
 		UserService userService= new UserService(new UserDbStorage(new JdbcTemplate()), new UserFriendDbStorage(new JdbcTemplate()));
 		Optional<User> userOptiona = Optional.ofNullable(userService.getUserDbStorage().create(new User(1,
-				"user@gmail.com", "gg", "serg", Date.from(LocalDate.of(1999,12,30).
-				atStartOfDay(ZoneId.systemDefault()).toInstant()))));
+				"user@gmail.com", "gg", "serg", LocalDate.of(1999,10,1))));
 		Optional<User> userOptional = userService.getUserDbStorage().getUser(1);
 
 		assertThat(userOptional)

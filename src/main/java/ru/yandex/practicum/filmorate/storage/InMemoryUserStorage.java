@@ -38,9 +38,7 @@ public class InMemoryUserStorage implements UserStorage{
 
     @Override
     public User create( User user) throws ValidationException {
-        if(user.getBirthday().toInstant()
-                .atZone(ZoneId.systemDefault())
-                .toLocalDate().isAfter(LocalDate.now())) {
+        if(user.getBirthday().isAfter(LocalDate.now())) {
             throw new ValidationException("Пользователь не соответсвует критериям.");
         }
         if(user.getId()==null){
@@ -55,9 +53,7 @@ public class InMemoryUserStorage implements UserStorage{
 
     @Override
     public User put( User user) throws ValidationException {
-        if( user.getBirthday().toInstant()
-                .atZone(ZoneId.systemDefault())
-                .toLocalDate().isAfter(LocalDate.now())) {
+        if( user.getBirthday().isAfter(LocalDate.now())) {
             throw new ValidationException("Пользователь не соответсвует критериям.");
         }
         if(users.containsKey(user.getId())){
