@@ -22,33 +22,34 @@ public class FilmController {
 
     @GetMapping
     public Collection<Film> findAll() {
-        return filmService.getFilmDbStorage().findAll();
+        return filmService.findAll();
     }
 
     @PostMapping
     public Film create(@Valid @RequestBody Film film) throws ValidationException {
-        return filmService.getFilmDbStorage().create(film);
+
+        return filmService.create(film);
     }
 
     @PutMapping
     public Film put(@Valid @RequestBody Film film) throws ValidationException {
-        return filmService.getFilmDbStorage().put(film);
+        return filmService.put(film);
     }
 
     @DeleteMapping
     public  Film delete(@Valid @RequestBody Film film) throws ValidationException {
-        return filmService.getFilmDbStorage().delete(film);
+        return filmService.delete(film);
     }
 
     @PutMapping("/{id}/like/{userId}")
-    public Optional<Film> addLike(@PathVariable("id") Integer id, @PathVariable("userId") Integer userId)
+    public Film addLike(@PathVariable("id") Integer id, @PathVariable("userId") Integer userId)
             throws ValidationException {
         return filmService.addLike(id, userId);
     }
 
     @DeleteMapping ("/{id}/like/{userId}")
-    public Optional<Film> deleteLike(@PathVariable Integer id, @PathVariable Integer userId) throws ValidationException {
-        return filmService.delete(id, userId);
+    public Film deleteLike(@PathVariable Integer id, @PathVariable Integer userId) throws ValidationException {
+        return filmService.deletelike(id, userId);
     }
 
     @GetMapping("/popular")
@@ -61,7 +62,7 @@ public class FilmController {
     }
 
     @GetMapping("/{id}")
-    public Optional<Film> getFilmById(@PathVariable Integer id)  {
-        return filmService.getFilmDbStorage().getFilm(id);
+    public Film getFilmById(@PathVariable Integer id)  {
+        return filmService.getFilmById(id);
     }
 }

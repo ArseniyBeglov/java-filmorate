@@ -9,6 +9,7 @@ import javax.validation.constraints.NotNull;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 import java.time.Duration;
 import java.util.Set;
@@ -21,21 +22,19 @@ public class Film {
     @NotBlank
     private String name;
     private String description;
-    private Date releaseDate;
+    private LocalDate releaseDate;
     private int duration;
-
-    private int genreId;
-
+    private MPA mpa;
 
 
 
-    public Film(Integer id, String name, String description, Date releaseDate, int duration, int genreId) {
+    public Film(Integer id, String name, String description, LocalDate releaseDate, int duration, MPA mpa) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.releaseDate = releaseDate;
         this.duration = duration;
-        this.genreId = genreId;
+        this.mpa = mpa;
     }
 
 

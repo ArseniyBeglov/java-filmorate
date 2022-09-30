@@ -23,10 +23,10 @@ public class GenresController {
     }
     @GetMapping
     public Collection<Genres> findAll() {
-        return filmService.getFilmGenresDbStorage().findAll();
+        return filmService.findAllGenres();
     }
     @GetMapping("/{id}")
     public Genres getGenresById(@PathVariable Integer id){
-        return filmService.getFilmGenresDbStorage().getGenre(id);
+        return filmService.getGenresById(id);
     }
 }

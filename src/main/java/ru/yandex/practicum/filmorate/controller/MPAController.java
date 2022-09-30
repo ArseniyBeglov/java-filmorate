@@ -24,10 +24,10 @@ public class MPAController {
 
     @GetMapping
     public Collection<MPA> findAll() {
-        return filmService.getFilmMpaDbStorage().findAll();
+        return filmService.findAllMPA();
     }
     @GetMapping("/{id}")
-    public MPA getGenresById(@PathVariable Integer id)  {
-        return filmService.getFilmMpaDbStorage().getMpa(id);
+    public MPA getMpaById(@PathVariable Integer id)  {
+        return filmService.getMpaById(id);
     }
 }

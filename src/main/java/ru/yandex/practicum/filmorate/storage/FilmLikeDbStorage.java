@@ -4,20 +4,23 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 
+import ru.yandex.practicum.filmorate.exception.ObjectNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.User;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
-import java.util.Optional;
+
 @Component("filmLikeDbStorage")
 public class FilmLikeDbStorage {
     private final JdbcTemplate jdbcTemplate;
-
-    public FilmLikeDbStorage(JdbcTemplate jdbcTemplate) {
+    private final FilmMpaDbStorage filmMpaDbStorage;
+    private final UserDbStorage userDbStorage;
+    public FilmLikeDbStorage(JdbcTemplate jdbcTemplate, FilmMpaDbStorage filmMpaDbStorage, UserDbStorage userDbStorage) {
         this.jdbcTemplate = jdbcTemplate;
+        this.filmMpaDbStorage = filmMpaDbStorage;
+        this.userDbStorage = userDbStorage;
     }
 
     public void create(Integer id, Integer userId) throws ValidationException {
@@ -35,37 +38,31 @@ public class FilmLikeDbStorage {
                 ,id,userId,id);
 
     }
-    public Collection<Film> getPopularFilms(Integer count) {
-        String sqlQuery = "select film_id , count(user_id)" +
-                "from film_likes group by film_id order by count(user_id) desc " + "limit ?";
-        return jdbcTemplate.query(sqlQuery, this::mapRowToUser,count);
-    }
-    private Film mapRowToUser(ResultSet resultSet, int rowNum) throws SQLException {
-        return getFilm(resultSet.getInt("film_id"));
-    }
-
     public void delete(Integer id, Integer userId) throws ValidationException {
+        if(!userDbStorage.getUser(userId).isPresent()){
+            throw new ObjectNotFoundException("");
+        }
         String sqlQuery = "delete from film_likes where user_id = ?";
         jdbcTemplate.update(sqlQuery, userId) ;
     }
 
-    private Film getFilm(Integer id)  {
-        SqlRowSet filmRows = jdbcTemplate.queryForRowSet("select * from films where id = ?", id);
 
-        // обрабатываем результат выполнения запроса
-        if(filmRows.next()) {
-            Film film = new Film(
-                    filmRows.getInt("id"),
-                    filmRows.getString("name "),
-                    filmRows.getString("description"),
-                    filmRows.getDate("release_date"),
-                    filmRows.getInt("duration"),
-                    filmRows.getInt("rating_id "));
-            return film;
-        } else {
-
-            return null;
-        }
+    public Collection<Film> getPopularFilms(Integer count) {
+        String sqlQuery = "select f.*, count(fl.user_id) from films as f " +
+                "left outer join film_likes as fl on f.id=fl.film_id group by f.id=fl.film_id order by count(fl.user_id)" +
+                "" + "limit ?";
+        return jdbcTemplate.query(sqlQuery, this::mapRowToUser,count);
     }
+    private Film mapRowToUser(ResultSet resultSet, int rowNum) throws SQLException {
+        return Film.builder()
+                .id(resultSet.getInt("id"))
+                .name(resultSet.getString("name"))
+                .description(resultSet.getString("description"))
+                .releaseDate(resultSet.getDate("release_date").toLocalDate())
+                .duration(resultSet.getInt("duration"))
+                .mpa(filmMpaDbStorage.getMpa(resultSet.getInt("rating_id")))
+                .build();
+    }
+
 
 }
