@@ -10,6 +10,7 @@ import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genres;
 import ru.yandex.practicum.filmorate.model.MPA;
+import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.storage.*;
@@ -35,18 +36,25 @@ class FilmorateApplicationTests {
 
     @Test
     public void testFindUserById() throws ValidationException {
-        Collection<Genres> list = new ArrayList<>();
-        list.add(new Genres(1, "name"));
-        MPA mpa = new MPA(1, "mpa");
-        Optional<Film> film = Optional.ofNullable(filmDbStorage.create(new Film(0, "name", "descrip",
-                LocalDate.of(1999, 1, 1), 120, new MPA(1, "name"), list)));
-        assertThat(film)
+//        Collection<Genres> list = new ArrayList<>();
+//        list.add(new Genres(1, "name"));
+//        MPA mpa = new MPA(1, "mpa");
+//        Optional<Film> film = Optional.ofNullable(filmDbStorage.create(new Film(0, "name", "descrip",
+//                LocalDate.of(1999, 1, 1), 120, new MPA(1, "name"), list)));
+//        assertThat(film)
+//                .isPresent()
+//                .hasValueSatisfying(user ->
+//                        assertThat(user).hasFieldOrPropertyWithValue("id", 1)
+//                );
+        userDbStorage.create(new User(1,"dddd@fefef.com","log","name",LocalDate.of(1999,1,1)));
+        Optional<User> userOptional = userDbStorage.getUser(1);
+
+        assertThat(userOptional)
                 .isPresent()
                 .hasValueSatisfying(user ->
                         assertThat(user).hasFieldOrPropertyWithValue("id", 1)
                 );
 
-        System.out.println(film);
 
     }
 
