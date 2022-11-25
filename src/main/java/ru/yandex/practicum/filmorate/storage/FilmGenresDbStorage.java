@@ -4,10 +4,12 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.ObjectNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.FilmGenres;
 import ru.yandex.practicum.filmorate.model.Genres;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -40,12 +42,22 @@ public class FilmGenresDbStorage {
         jdbcTemplate.update(sqlQuery, genreId) ;
     }
 
-    public List<Genres> getGenresToFilm(Integer filmId){
-        String sqlQuery = "select * from film_genres where film_id = ?";
-        return jdbcTemplate.query(sqlQuery, this::mapRowToGenres);
+    public Collection<Genres> getGenresToFilm(Integer filmId){
+        String sqlQuery = "select * from film_genres";
+        List<FilmGenres> list= jdbcTemplate.query(sqlQuery, this::mapRowToGenres);
+        Collection<Genres> genres= new ArrayList<>();
+        for(FilmGenres filmGenres: list){
+            if(filmGenres.getFilmId()==filmId){
+                genres.add(getGenre(filmGenres.getGenreId()));
+            }
+        }
+        return genres;
     }
-    private Genres mapRowToGenres(ResultSet resultSet, int rowNum) throws SQLException {
-        return getGenre(resultSet.getInt("genre_id"));
+    private FilmGenres mapRowToGenres(ResultSet resultSet, int rowNum) throws SQLException {
+        return FilmGenres.builder()
+                .filmId(resultSet.getInt("film_id"))
+                .genreId(resultSet.getInt("genre_id"))
+                .build();
     }
 
     public Collection<Genres> findAll() {
