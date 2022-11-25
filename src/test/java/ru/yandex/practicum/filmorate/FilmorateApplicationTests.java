@@ -7,14 +7,18 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genres;
 import ru.yandex.practicum.filmorate.model.MPA;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.storage.*;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -22,26 +26,27 @@ import static org.assertj.core.api.Assertions.assertThat;
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 class FilmorateApplicationTests {
-
+	private final JdbcTemplate jdbcTemplate;
+	private final FilmMpaDbStorage filmMpaDbStorage;
+	private final FilmGenresDbStorage filmGenresDbStorage;
+	private final UserDbStorage userDbStorage;
+	private final FilmDbStorage filmDbStorage;
 
 
 	@Test
 	public void testFindUserById() throws ValidationException {
-//		JdbcTemplate jdbcTemplate = new JdbcTemplate();
-//		UserDbStorage userDbStorage = new UserDbStorage(jdbcTemplate);
-//		FilmMpaDbStorage filmMpaDbStorage=new FilmMpaDbStorage(jdbcTemplate);
-//		FilmGenresDbStorage filmGenresDbStorage = new FilmGenresDbStorage(jdbcTemplate,filmMpaDbStorage);
-//		UserService userService= new UserService(userDbStorage, new UserFriendDbStorage(jdbcTemplate));
-//		FilmService filmService = new FilmService(userService, new FilmDbStorage(jdbcTemplate,filmMpaDbStorage,filmGenresDbStorage),
-//				filmGenresDbStorage, new FilmLikeDbStorage(jdbcTemplate, filmMpaDbStorage, userDbStorage, filmGenresDbStorage, filmDbStorage),
-//				filmMpaDbStorage);
-//		MPA mpa= new MPA(3,"R");
-//		List<Genres> list = new ArrayList<>();
-//		list.add(new Genres(1,"R"));
-//		list.add(new Genres(2,"NC"));
-//		Film film = new Film(1, "new film","descp", LocalDate.of(1999,4,20),120,
-//				mpa);
-//		System.out.println(film);
+		Collection<Genres> list = new ArrayList<>();
+		list.add(new Genres(1,"name"));
+		MPA mpa = new MPA(1, "mpa");
+		Optional<Film> film = Optional.ofNullable(filmDbStorage.create(new Film(0, "name", "descrip",
+				LocalDate.of(1999, 1, 1), 120, new MPA(1, "name"), list)));
+		assertThat(film)
+				.isPresent()
+				.hasValueSatisfying(user ->
+						assertThat(user).hasFieldOrPropertyWithValue("id", 1)
+				);
+
+		System.out.println(film);
 
 	}
 

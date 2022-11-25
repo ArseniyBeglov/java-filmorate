@@ -13,6 +13,7 @@ import ru.yandex.practicum.filmorate.model.Genres;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.*;
 
 @Component("filmDbStorage")
@@ -52,7 +53,10 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film create(Film film) throws ValidationException {
-
+        if(film.getReleaseDate().isBefore(LocalDate.of(1895,12,28)) || film.getName().isBlank() ||
+        film.getDescription().length()>201 || film.getDuration()<0){
+            throw new ValidationException("Error");
+        }
         String sqlQuery = "insert into films( name, description,release_date, duration, rating_id ) " +
                 "values ( ?, ?,?,?,?)";
         jdbcTemplate.update(sqlQuery,
@@ -64,7 +68,8 @@ public class FilmDbStorage implements FilmStorage {
         if (film.getGenres() != null) {
             createGenresForFilm(film);
         }
-
+        log.info("ggwp");
+        log.info(getFilmByName(film.getName()).toString());
         return getFilmByName(film.getName());
     }
 
