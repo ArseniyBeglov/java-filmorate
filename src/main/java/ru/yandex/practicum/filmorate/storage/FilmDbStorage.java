@@ -53,8 +53,8 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film create(Film film) throws ValidationException {
-        if(film.getReleaseDate().isBefore(LocalDate.of(1895,12,28)) || film.getName().isBlank() ||
-        film.getDescription().length()>201 || film.getDuration()<0){
+        if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28)) || film.getName().isBlank() ||
+                film.getDescription().length() > 201 || film.getDuration() < 0) {
             throw new ValidationException("Error");
         }
         String sqlQuery = "insert into films( name, description,release_date, duration, rating_id ) " +
@@ -106,8 +106,8 @@ public class FilmDbStorage implements FilmStorage {
         }
     }
 
-    private void updateGenresForFilm(Film film){
-        if(filmGenresDbStorage.getGenresToFilm(film.getId())!=null){
+    private void updateGenresForFilm(Film film) {
+        if (filmGenresDbStorage.getGenresToFilm(film.getId()) != null) {
             String sqlQuery = "delete from film_genres where film_id = ?";
             jdbcTemplate.update(sqlQuery, film.getId());
         }
