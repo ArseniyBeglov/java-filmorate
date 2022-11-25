@@ -1,8 +1,6 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.Builder;
-import lombok.Data;
-import lombok.NonNull;
+import lombok.*;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -25,17 +23,16 @@ public class Film {
     private LocalDate releaseDate;
     private int duration;
     private MPA mpa;
+    private Collection<Genres> genres;
 
-
-
-    public Film(Integer id, String name, String description, LocalDate releaseDate, int duration, MPA mpa) {
+    public Film(Integer id, String name, String description, LocalDate releaseDate, int duration, MPA mpa, Collection<Genres> genresList) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.releaseDate = releaseDate;
         this.duration = duration;
         this.mpa = mpa;
+        this.genres = genresList;
     }
-
 
 }

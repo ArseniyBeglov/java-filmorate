@@ -27,7 +27,6 @@ public class FilmController {
 
     @PostMapping
     public Film create(@Valid @RequestBody Film film) throws ValidationException {
-
         return filmService.create(film);
     }
 

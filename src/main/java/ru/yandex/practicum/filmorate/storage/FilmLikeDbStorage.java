@@ -51,9 +51,9 @@ public class FilmLikeDbStorage {
         String sqlQuery = "select f.*, count(fl.user_id) from films as f " +
                 "left outer join film_likes as fl on f.id=fl.film_id group by f.id=fl.film_id order by count(fl.user_id)" +
                 "" + "limit ?";
-        return jdbcTemplate.query(sqlQuery, this::mapRowToUser,count);
+        return jdbcTemplate.query(sqlQuery, this::mapRowToLikes,count);
     }
-    private Film mapRowToUser(ResultSet resultSet, int rowNum) throws SQLException {
+    private Film mapRowToLikes(ResultSet resultSet, int rowNum) throws SQLException {
         return Film.builder()
                 .id(resultSet.getInt("id"))
                 .name(resultSet.getString("name"))

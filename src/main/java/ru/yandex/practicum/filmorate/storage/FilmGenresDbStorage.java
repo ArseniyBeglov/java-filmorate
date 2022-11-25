@@ -1,23 +1,23 @@
 package ru.yandex.practicum.filmorate.storage;
 
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.ObjectNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
-import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genres;
-import ru.yandex.practicum.filmorate.model.User;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.List;
+
 @Component("filmGenresDbStorage")
 public class FilmGenresDbStorage {
     private final JdbcTemplate jdbcTemplate;
-
-    public FilmGenresDbStorage(JdbcTemplate jdbcTemplate) {
+    private final FilmMpaDbStorage filmMpaDbStorage;
+    public FilmGenresDbStorage(JdbcTemplate jdbcTemplate, FilmMpaDbStorage filmMpaDbStorage) {
         this.jdbcTemplate = jdbcTemplate;
+        this.filmMpaDbStorage = filmMpaDbStorage;
     }
     public void create(Integer id, Integer genreId) throws ValidationException {
         String sqlQuery = "insert into film_genres(film_id, genre_id) " +
@@ -40,14 +40,20 @@ public class FilmGenresDbStorage {
         jdbcTemplate.update(sqlQuery, genreId) ;
     }
 
-    public Collection<Genres> findAll() {
-        String sqlQuery = "select * from genres";
-        return jdbcTemplate.query(sqlQuery, this::mapRowToFilm);
+    public List<Genres> getGenresToFilm(Integer filmId){
+        String sqlQuery = "select * from film_genres where film_id = ?";
+        return jdbcTemplate.query(sqlQuery, this::mapRowToGenres);
+    }
+    private Genres mapRowToGenres(ResultSet resultSet, int rowNum) throws SQLException {
+        return getGenre(resultSet.getInt("genre_id"));
     }
 
+    public Collection<Genres> findAll() {
+        String sqlQuery = "select * from genres";
+        return jdbcTemplate.query(sqlQuery, this::mapRowToGenre);
+    }
 
-
-    private Genres mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {
+    private Genres mapRowToGenre(ResultSet resultSet, int rowNum) throws SQLException {
         return Genres.builder()
                 .id(resultSet.getInt("id"))
                 .name(resultSet.getString("name"))
@@ -61,6 +67,8 @@ public class FilmGenresDbStorage {
         }else{
             throw new ObjectNotFoundException("такого жанра нет");
         }
-
     }
+
+
+
 }
