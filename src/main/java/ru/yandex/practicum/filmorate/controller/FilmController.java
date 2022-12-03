@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
@@ -23,32 +22,33 @@ public class FilmController {
 
     @GetMapping
     public Collection<Film> findAll() {
-        return filmService.getInMemoryFilmStorage().findAll();
+        return filmService.findAll();
     }
 
     @PostMapping
     public Film create(@Valid @RequestBody Film film) throws ValidationException {
-        return filmService.getInMemoryFilmStorage().create(film);
+        return filmService.create(film);
     }
 
     @PutMapping
     public Film put(@Valid @RequestBody Film film) throws ValidationException {
-        return filmService.getInMemoryFilmStorage().put(film);
+        return filmService.put(film);
     }
 
     @DeleteMapping
-    public  Film delete(@Valid @RequestBody Film film) {
-        return filmService.getInMemoryFilmStorage().delete(film);
+    public  Film delete(@Valid @RequestBody Film film) throws ValidationException {
+        return filmService.delete(film);
     }
 
     @PutMapping("/{id}/like/{userId}")
-    public Film addLike(@PathVariable("id") Integer id, @PathVariable("userId") Integer userId) {
+    public Film addLike(@PathVariable("id") Integer id, @PathVariable("userId") Integer userId)
+            throws ValidationException {
         return filmService.addLike(id, userId);
     }
 
     @DeleteMapping ("/{id}/like/{userId}")
     public Film deleteLike(@PathVariable Integer id, @PathVariable Integer userId) throws ValidationException {
-        return filmService.delete(id, userId);
+        return filmService.deletelike(id, userId);
     }
 
     @GetMapping("/popular")
@@ -62,6 +62,6 @@ public class FilmController {
 
     @GetMapping("/{id}")
     public Film getFilmById(@PathVariable Integer id)  {
-        return filmService.getInMemoryFilmStorage().getFilm(id);
+        return filmService.getFilmById(id);
     }
 }

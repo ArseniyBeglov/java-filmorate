@@ -9,6 +9,7 @@ import ru.yandex.practicum.filmorate.service.UserService;
 
 import javax.validation.Valid;
 import java.util.Collection;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -24,34 +25,35 @@ public class UserController {
 
     @GetMapping
     public Collection<User> findAll() {
-        log.debug("Текущее количество пользователей: {}", userService.getInMemoryUserStorage().findAll().size());
-        return userService.getInMemoryUserStorage().findAll();
+        log.debug("Текущее количество пользователей: {}", userService.getUserDbStorage().findAll().size());
+        return userService.getUserDbStorage().findAll();
     }
 
     @PostMapping
     public User create(@Valid @RequestBody User user) throws ValidationException {
-        return userService.getInMemoryUserStorage().create(user);
+        return userService.getUserDbStorage().create(user);
     }
 
     @PutMapping
     public User put(@Valid @RequestBody User user) throws ValidationException {
 
-        return userService.getInMemoryUserStorage().put(user);
+        return userService.getUserDbStorage().put(user);
     }
 
     @DeleteMapping
-    public User delete(@Valid @RequestBody User user)  {
-        return userService.getInMemoryUserStorage().delete(user);
+    public User delete(@Valid @RequestBody User user) throws ValidationException {
+        return userService.getUserDbStorage().delete(user);
     }
 
     @PutMapping("/{id}/friends/{friendId}")
-    public User addFriend(@PathVariable("id") Integer id, @PathVariable("friendId") Integer friendId)  {
+    public User addFriend(@PathVariable("id") Integer id, @PathVariable("friendId") Integer friendId)
+            throws ValidationException {
         return userService.addFriend(id,friendId);
     }
 
     @DeleteMapping("/{id}/friends/{friendId}")
-    public User deleteFriend(@PathVariable Integer id, @PathVariable Integer friendId)  {
-        return userService.delete(id,friendId);
+    public void deleteFriend(@PathVariable Integer id, @PathVariable Integer friendId) throws ValidationException {
+        userService.delete(id,friendId);
     }
 
     @GetMapping("/{id}/friends")
@@ -60,8 +62,8 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public User getUserById(@PathVariable Integer id)  {
-        return userService.getInMemoryUserStorage().getUser(id);
+    public Optional<User> getUserById(@PathVariable Integer id)  {
+        return userService.getUserDbStorage().getUser(id);
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")
